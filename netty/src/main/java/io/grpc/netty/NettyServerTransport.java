@@ -36,7 +36,6 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelPromise;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
-import java.io.IOException;
 import java.net.SocketAddress;
 import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
@@ -53,6 +52,8 @@ class NettyServerTransport implements ServerTransport {
 
   // Some exceptions are not very useful and add too much noise to the log
   private static final ImmutableList<String> QUIET_EXCEPTIONS = ImmutableList.of(
+      "IOException",
+      "SocketException", /* connection resets */
       "NativeIoException" /* Netty exceptions */);
 
   private final InternalLogId logId;
@@ -183,8 +184,7 @@ class NettyServerTransport implements ServerTransport {
    */
   @VisibleForTesting
   static Level getLogLevel(Throwable t) {
-    if (t.getClass().equals(IOException.class)
-        || QUIET_EXCEPTIONS.contains(t.getClass().getSimpleName())) {
+    if (QUIET_EXCEPTIONS.contains(t.getClass().getSimpleName())) {
       return Level.FINE;
     }
     return Level.INFO;

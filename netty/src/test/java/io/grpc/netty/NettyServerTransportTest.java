@@ -22,6 +22,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
 import java.io.IOException;
+import java.net.SocketException;
 import java.util.logging.Level;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -64,5 +65,19 @@ public class NettyServerTransportTest {
     NativeIoException fakeNativeIoException = new NativeIoException();
 
     assertThat(getLogLevel(fakeNativeIoException)).isEqualTo(Level.FINE);
+  }
+
+  @Test
+  public void socketException() {
+    SocketException socketEx = new SocketException();
+    assertThat(getLogLevel(socketEx)).isEqualTo(Level.FINE);
+  }
+
+  @Test
+  public void extendedSocketException() {
+    class ExtendedSocketException extends SocketException {}
+
+    ExtendedSocketException e = new ExtendedSocketException();
+    assertThat(getLogLevel(e)).isEqualTo(Level.INFO);
   }
 }
